@@ -23,7 +23,15 @@ const TPL = `
     
             <p><strong>Note:</strong> If you leave the proxy setting blank, the system proxy will be used (applies to desktop/electron build only)</p>
         </div>
-    
+
+        <div class="form-group">
+            <label for="sync-server-timeout">Sync interval (milliseconds)</label>
+            <input class="form-control" id="sync-server-interval" min=0" max="10000000" type="number" style="text-align: left;">
+
+            <p><strong>Note:</strong> If you set the sync interval value to 0, then sync is disabled and will have to be performed manually</p>
+        </div>
+
+
         <div style="display: flex; justify-content: space-between;">
             <button class="btn btn-primary">Save</button>
     
@@ -51,6 +59,7 @@ export default class SyncOptions extends OptionsTab {
         this.$syncServerTimeout = this.$widget.find("#sync-server-timeout");
         this.$syncProxy = this.$widget.find("#sync-proxy");
         this.$testSyncButton = this.$widget.find("#test-sync-button");
+        this.$syncServerInterval = this.$widget.find("#sync-server-interval");
 
         this.$form.on('submit', () => this.save());
 
@@ -70,13 +79,15 @@ export default class SyncOptions extends OptionsTab {
         this.$syncServerHost.val(options.syncServerHost);
         this.$syncServerTimeout.val(options.syncServerTimeout);
         this.$syncProxy.val(options.syncProxy);
+        this.$syncServerInterval.val(options.syncServerInterval ?? 1000)
     }
 
     save() {
         this.updateMultipleOptions({
             'syncServerHost': this.$syncServerHost.val(),
             'syncServerTimeout': this.$syncServerTimeout.val(),
-            'syncProxy': this.$syncProxy.val()
+            'syncProxy': this.$syncProxy.val(),
+            'syncServerInterval': this.$syncServerInterval.val(),
         });
 
         return false;

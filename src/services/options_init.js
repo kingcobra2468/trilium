@@ -41,6 +41,7 @@ function initNotSyncedOptions(initialized, opts = {}) {
     optionService.createOption('syncServerHost', opts.syncServerHost || '', false);
     optionService.createOption('syncServerTimeout', '120000', false);
     optionService.createOption('syncProxy', opts.syncProxy || '', false);
+    optionService.createOption('syncServerInterval', '1000', false);
 }
 
 const defaultOptions = [

@@ -13,6 +13,7 @@ const ALLOWED_OPTIONS = new Set([
     'theme',
     'syncServerHost',
     'syncServerTimeout',
+    'syncServerInterval',
     'syncProxy',
     'hoistedNoteId',
     'mainFontSize',

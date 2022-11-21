@@ -1,6 +1,8 @@
 import NoteContextAwareWidget from "../note_context_aware_widget.js";
 import utils from "../../services/utils.js";
 import branchService from "../../services/branches.js";
+import protectedSessionHolder from "../../services/protected_session_holder.js";
+import server from "../../services/server.js";
 
 const TPL = `
 <div class="dropdown note-actions">
@@ -32,6 +34,7 @@ const TPL = `
         <a class="dropdown-item import-files-button">Import files</a>
         <a class="dropdown-item export-note-button">Export note</a>
         <a class="dropdown-item delete-note-button">Delete note</a>
+        <a class="dropdown-item save-note-button">Save note</a>
         <a data-trigger-command="printActiveNote" class="dropdown-item print-active-note-button"><kbd data-command="printActiveNote"></kbd> Print note</a>
     </div>
 </div>`;
@@ -62,7 +65,7 @@ export default class NoteActionsWidget extends NoteContextAwareWidget {
         });
 
         this.$importNoteButton = this.$widget.find('.import-files-button');
-        this.$importNoteButton.on("click", () => this.triggerCommand("showImportDialog", {noteId: this.noteId}));
+        this.$importNoteButton.on("click", () => this.triggerCommand("showImportDialog", { noteId: this.noteId }));
 
         this.$widget.on('click', '.dropdown-item', () => this.$widget.find("[data-toggle='dropdown']").dropdown('toggle'));
 
@@ -76,6 +79,12 @@ export default class NoteActionsWidget extends NoteContextAwareWidget {
 
             branchService.deleteNotes([this.note.getParentBranches()[0].branchId], true);
         });
+
+        this.$saveNoteButton = this.$widget.find(".save-note-button");
+        this.$saveNoteButton.on("click", () => {
+            this.saveNote.bind(this)
+            this.saveNote()
+        })
     }
 
     refreshWithNote(note) {
@@ -98,9 +107,33 @@ export default class NoteActionsWidget extends NoteContextAwareWidget {
         }
     }
 
-    entitiesReloadedEvent({loadResults}) {
+    entitiesReloadedEvent({ loadResults }) {
         if (loadResults.isNoteReloaded(this.noteId)) {
             this.refresh();
         }
     }
+    /*
+    async saveNoteEvent() {
+        this.saveNote.bind(this)
+        this.saveNote()
+    }*/
+
+    async saveNote() {
+        const { note } = this.noteContext;
+        const { noteId } = note;
+
+        const widget = await this.noteContext.getTypeWidget()
+        const content = widget.getContent();
+
+        // for read only notes
+        if (content === undefined) {
+            return;
+        }
+
+        //protectedSessionHolder.touchProtectedSessionIfNecessary(note);
+
+        await server.put(`notes/${noteId}/content`, { content }, this.componentId);
+
+    }
+
 }

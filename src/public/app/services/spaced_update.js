@@ -7,6 +7,11 @@ export default class SpacedUpdate {
     }
 
     scheduleUpdate() {
+        if (this.updateInterval == 0) {
+            this.changed = true;
+            this.triggerUpdate();
+        }
+
         if (!this.changeForbidden) {
             this.changed = true;
             setTimeout(() => this.triggerUpdate());

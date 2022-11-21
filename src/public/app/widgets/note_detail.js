@@ -8,6 +8,7 @@ import keyboardActionsService from "../services/keyboard_actions.js";
 import noteCreateService from "../services/note_create.js";
 import attributeService from "../services/attributes.js";
 import attributeRenderer from "../services/attribute_renderer.js";
+import options from "../services/options.js";
 
 import EmptyTypeWidget from "./type_widgets/empty.js";
 import EditableTextTypeWidget from "./type_widgets/editable_text.js";
@@ -80,7 +81,7 @@ export default class NoteDetailWidget extends NoteContextAwareWidget {
             protectedSessionHolder.touchProtectedSessionIfNecessary(note);
 
             await server.put(`notes/${noteId}/content`, {content}, this.componentId);
-        });
+        }, options.get('syncServerInterval') ?? 1000);
 
         appContext.addBeforeUnloadListener(this);
     }

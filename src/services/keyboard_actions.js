@@ -35,9 +35,9 @@ const DEFAULT_KEYBOARD_ACTIONS = [
         scope: "window"
     },
     {
-        actionName: "quickSearch",
+        actionName: "saveNote",
         defaultShortcuts: ["CommandOrControl+S"],
-        scope: "window"
+        scope: "text-detail"
     },
     {
         actionName: "searchInSubtree",

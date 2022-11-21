@@ -9,6 +9,8 @@ import noteCreateService from "../../services/note_create.js";
 import AbstractTextTypeWidget from "./abstract_text_type_widget.js";
 import link from "../../services/link.js";
 import appContext from "../../services/app_context.js";
+import server from "../../services/server.js";
+import options from "../../services/options.js";
 
 const ENABLE_INSPECTOR = false;
 
@@ -128,8 +130,11 @@ export default class EditableTextTypeWidget extends AbstractTextTypeWidget {
                 enablePreview: true // Enable preview view
             }
         });
-
-        this.textEditor.model.document.on('change:data', () => this.spacedUpdate.scheduleUpdate());
+        
+        let updateInterval = options.get('syncServerInterval')
+        if (updateInterval && updateInterval > 0) {
+            this.textEditor.model.document.on('change:data', () => this.spacedUpdate.scheduleUpdate());
+        }
 
         if (glob.isDev && ENABLE_INSPECTOR) {
             await import(/* webpackIgnore: true */'../../../libraries/ckeditor/inspector.js');
@@ -331,5 +336,28 @@ export default class EditableTextTypeWidget extends AbstractTextTypeWidget {
 
     async refreshIncludedNoteEvent({noteId}) {
         this.refreshIncludedNote(this.$editor, noteId);
+    }
+
+    async saveNoteEvent() {
+        this.saveNote.bind(this)
+        this.saveNote()
+        //this.spacedUpdate.scheduleUpdate()
+    }
+
+    async saveNote() {
+        const { note } = this.noteContext;
+        const { noteId } = note;
+
+        const widget = await this.noteContext.getTypeWidget()
+        const content = widget.getContent();
+
+        // for read only notes
+        if (content === undefined) {
+            return;
+        }
+
+        //protectedSessionHolder.touchProtectedSessionIfNecessary(note);
+
+        await server.put(`notes/${noteId}/content`, { content }, this.componentId);
     }
 }

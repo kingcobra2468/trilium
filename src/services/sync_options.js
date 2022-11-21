@@ -24,5 +24,6 @@ module.exports = {
         return !!syncServerHost && syncServerHost !== 'disabled';
     },
     getSyncTimeout: () => parseInt(get('syncServerTimeout')) || 120000,
-    getSyncProxy: () => get('syncProxy')
+    getSyncProxy: () => get('syncProxy'),
+    getSyncInterval: () => parseInt(get('syncServerInterval')) || 1000,
 };
